@@ -1,20 +1,9 @@
 "use client";
-import React, { useState, useMemo, useEffect } from 'react';
-import { Plus, Minus, Calendar as CalendarIcon, CheckSquare, Utensils, ShoppingCart, Box, Trash2, Wand2, Copy, X, ChevronDown, ChevronRight, BookOpen, Cloud, CloudOff } from "lucide-react";
 
-// --- FIREBASE IMPORTS ---
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
+import React, { useState, useEffect } from "react";
+import { Plus, Minus, Calendar as CalendarIcon, CheckSquare, Utensils, ShoppingCart, Box, Copy, ChevronDown, ChevronRight, X, Sparkles } from "lucide-react";
 
-// --- FIREBASE SETUP ---
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'family-dashboard-app';
-
-// --- INITIAL MOCK DATA ---
+// --- INITIAL DATA (Used only on first load) ---
 const INITIAL_INVENTORY = [
   // Vegetables
   { id: "i1", name: "Tomato", emoji: "🍅", count: 2, category: "Vegetables" },
@@ -86,47 +75,19 @@ const INITIAL_RECIPES = [
 ];
 
 const INITIAL_EVENTS = [
-  { id: "e1", date: "2026-08-15", title: "🎂 Birthday" },
-  { id: "e2", date: "2026-08-22", title: "🏖 Holiday" },
+  { id: "2026-08-15", title: "🎂 Birthday", category: "Family" },
+  { id: "2026-08-21", title: "⚽ Football", category: "Sports" },
+  { id: "2026-08-22", title: "🎬 Cinema", category: "Leisure" },
 ];
 
-const callGeminiAPI = async (payload, retries = 3, delay = 1000) => {
-  const apiKey = ""; // Left empty for Canvas to inject
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    
-    if (!response.ok) {
-      if (response.status === 429 && retries > 0) {
-        await new Promise(r => setTimeout(r, delay));
-        return callGeminiAPI(payload, retries - 1, delay * 2);
-      }
-      throw new Error(`API Error: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content) {
-       return data.candidates[0].content.parts[0].text;
-    }
-    throw new Error('Invalid response format');
-  } catch (error) {
-    if (retries > 0) {
-      await new Promise(r => setTimeout(r, delay));
-      return callGeminiAPI(payload, retries - 1, delay * 2);
-    }
-    throw error;
-  }
-};
-
-export default function App() {
+export default function FamilyDashboard() {
   const [activeTab, setActiveTab] = useState("calendar");
-  
-  // --- APP STATE ---
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [saveIndicator, setSaveIndicator] = useState("");
+
+  // State Management
+  const [events, setEvents] = useState(INITIAL_EVENTS);
+  const [tasks, setTasks] = useState(INITIAL_TASKS);
   const [inventory, setInventory] = useState(INITIAL_INVENTORY);
   const [recipes, setRecipes] = useState(INITIAL_RECIPES);
   const [events, setEvents] = useState(INITIAL_EVENTS);
@@ -144,123 +105,90 @@ export default function App() {
     Sunday: { breakfast: null, breakfastDrink: null, lunch: null, lunchDrink: null, dinner: null, dinnerDrink: null }
   });
 
-  // --- FIREBASE SYNC STATE ---
-  const [user, setUser] = useState(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [toastMessage, setToastMessage] = useState(null);
-
-  // Authentication
+  // Load from Local Storage on mount
   useEffect(() => {
-    const initAuth = async () => {
-      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-        await signInWithCustomToken(auth, __initial_auth_token);
-      } else {
-        await signInAnonymously(auth);
-      }
-    };
-    initAuth();
-    const unsubscribe = onAuthStateChanged(auth, setUser);
-    return () => unsubscribe();
+    const savedData = localStorage.getItem("familyDashboardState");
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      setEvents(parsed.events || INITIAL_EVENTS);
+      setTasks(parsed.tasks || INITIAL_TASKS);
+      setInventory(parsed.inventory || INITIAL_INVENTORY);
+      setRecipes(parsed.recipes || INITIAL_RECIPES);
+      setWeeklyMealPlan(parsed.weeklyMealPlan || weeklyMealPlan);
+    }
+    setIsLoaded(true);
   }, []);
 
-  // Fetch Data Once
+  // Save to Local Storage on change
   useEffect(() => {
-    if (!user) return;
-    const unsubscribe = onSnapshot(
-      doc(db, 'artifacts', appId, 'users', user.uid, 'dashboardData'),
-      (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data.inventory) setInventory(data.inventory);
-          if (data.recipes) setRecipes(data.recipes);
-          if (data.events) setEvents(data.events);
-          if (data.tasks) setTasks(data.tasks);
-          if (data.mealPlan) setMealPlan(data.mealPlan);
-        }
-        setDataLoaded(true);
-      },
-      (error) => {
-        console.error("Firestore fetch error:", error);
-        setDataLoaded(true); // Proceed with default mock data if fail
-      }
-    );
-    return () => unsubscribe();
-  }, [user]);
+    if (isLoaded) {
+      setSaveIndicator("Saving...");
+      const dataToSave = { events, tasks, inventory, recipes, weeklyMealPlan };
+      localStorage.setItem("familyDashboardState", JSON.stringify(dataToSave));
+      
+      const timeout = setTimeout(() => setSaveIndicator("✓ Saved locally"), 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [events, tasks, inventory, recipes, weeklyMealPlan, isLoaded]);
 
-  // Auto-Save Data (Debounced)
-  useEffect(() => {
-    if (!user || !dataLoaded) return;
-    setIsSaving(true);
-    
-    const saveData = async () => {
-      try {
-        await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'dashboardData'), {
-          inventory, recipes, events, tasks, mealPlan
-        });
-      } catch (e) {
-        console.error("Save error:", e);
-      } finally {
-        setTimeout(() => setIsSaving(false), 500); // Visual delay for badge
-      }
-    };
-
-    const timer = setTimeout(saveData, 1500); // Wait 1.5s after last change to save
-    return () => clearTimeout(timer);
-  }, [inventory, recipes, events, tasks, mealPlan, user, dataLoaded]);
-
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+  // --- HELPER FUNCTIONS ---
+  const updateInventoryCount = (id, delta) => {
+    setInventory(prev => prev.map(item => item.id === id ? { ...item, count: Math.max(0, item.count + delta) } : item));
   };
 
-  const updateInventory = (id, delta) => {
-    setInventory(prev => prev.map(item => 
-      item.id === id ? { ...item, count: Math.max(0, item.count + delta) } : item
-    ));
+  const assignRecipeToMeal = (day, mealType, recipeId) => {
+    const recipe = recipes.find(r => r.id === recipeId);
+    setWeeklyMealPlan(prev => ({
+      ...prev,
+      [day]: { ...prev[day], [mealType]: recipe || null }
+    }));
   };
 
-  if (!dataLoaded) {
-    return <div className="min-h-screen bg-[#F4F0E6] flex items-center justify-center text-4xl font-black uppercase">Loading Cloud...</div>
-  }
+  const assignDrinkToMeal = (day, mealType, drinkName) => {
+    setWeeklyMealPlan(prev => ({
+      ...prev,
+      [day]: { 
+        ...prev[day], 
+        drinks: { ...prev[day].drinks, [mealType]: drinkName } 
+      }
+    }));
+  };
+
+  const getDrinkOptions = () => inventory.filter(i => i.category === "Drinks").map(i => i.name);
+
+  // --- RENDER ---
+  if (!isLoaded) return <div className="min-h-screen bg-[#F4F0E6] flex justify-center items-center font-black text-2xl">LOADING DASHBOARD...</div>;
 
   return (
-    <div className="min-h-screen bg-[#F4F0E6] text-black font-sans selection:bg-[#FF90E8] p-2 md:p-8 relative pb-24">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[100] bg-black text-white border-4 border-black px-6 py-3 font-black uppercase text-center shadow-[4px_4px_0_0_#FFD500] animate-bounce">
-          {toastMessage}
-        </div>
-      )}
-
+    <div className="min-h-screen bg-[#F4F0E6] text-black font-sans p-2 md:p-8 overflow-x-hidden">
       {/* Header */}
-      <header className="mb-8 border-4 border-black bg-[#FFD500] p-4 md:p-6 shadow-[8px_8px_0_0_#000] flex flex-col lg:flex-row justify-between items-center gap-4 sticky top-2 z-50">
-        <div className="flex items-center gap-4">
-            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center">Family Board</h1>
-            
-            {/* Cloud Sync Status */}
-            <div className={`hidden md:flex items-center gap-2 border-2 border-black px-3 py-1 font-black text-xs uppercase shadow-[2px_2px_0_0_#000] transition-colors ${isSaving ? 'bg-[#FF90E8] text-black' : 'bg-[#4ADE80] text-black'}`}>
-               {isSaving ? <Cloud size={14} className="animate-pulse" /> : <Cloud size={14} />}
-               {isSaving ? 'Saving...' : 'Synced'}
-            </div>
+      <header className="mb-8 border-4 border-black bg-[#FF90E8] p-4 md:p-6 shadow-[4px_4px_0px_0px_#000] flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="w-full md:w-auto text-center md:text-left">
+          <h1 className="text-3xl md:text-4xl font-extrabold uppercase tracking-tight">Family Dashboard</h1>
+          <p className="font-semibold text-sm flex justify-center md:justify-start items-center gap-2">
+            Organized. Direct. Neo-Brutalist. 
+            <span className="bg-white text-xs px-2 py-1 border-2 border-black">{saveIndicator}</span>
+          </p>
         </div>
         
+        {/* Navigation Tabs */}
         <nav className="flex flex-wrap justify-center gap-2">
           {[
-            { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'bg-[#FF90E8]' },
-            { id: 'tasks', label: 'Tasks', icon: CheckSquare, color: 'bg-[#4ADE80]' },
-            { id: 'planner', label: 'Meals', icon: Utensils, color: 'bg-[#A7F3D0]' },
-            { id: 'inventory', label: 'Bag', icon: Box, color: 'bg-white' },
-            { id: 'shopping', label: 'Buy', icon: ShoppingCart, color: 'bg-[#FF8A8A]' },
+            { id: "calendar", label: "Calendar", icon: CalendarIcon, color: "bg-[#FFD500]" },
+            { id: "tasks", label: "Tasks", icon: CheckSquare, color: "bg-[#4ADE80]" },
+            { id: "planner", label: "Planner", icon: Utensils, color: "bg-[#A7F3D0]" },
+            { id: "inventory", label: "Inventory", icon: Box, color: "bg-[#6EE7B7]" },
+            { id: "shopping", label: "Buy", icon: ShoppingCart, color: "bg-[#F472B6]" },
           ].map(tab => (
-            <button 
-              key={tab.id} 
+            <button
+              key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 border-4 border-black px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none
-                ${activeTab === tab.id ? `${tab.color} translate-x-1 translate-y-1 !shadow-none` : tab.color}
-                hover:opacity-90`}
+              className={`flex items-center gap-2 border-2 border-black px-3 py-2 md:px-4 font-bold shadow-[2px_2px_0px_0px_#000] transition-transform active:translate-x-1 active:translate-y-1 text-sm md:text-base ${
+                activeTab === tab.id ? `${tab.color} translate-x-[2px] translate-y-[2px] shadow-none` : "bg-white"
+              }`}
             >
-              <tab.icon size={18} className="hidden sm:block" /> {tab.label}
+              <tab.icon className="w-4 h-4" />
+              <span className="hidden md:inline">{tab.label}</span>
             </button>
           ))}
         </nav>
