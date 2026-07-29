@@ -2,7 +2,19 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Minus, Calendar as CalendarIcon, CheckSquare, Utensils, ShoppingCart, Box, Trash2, Wand2, Copy, X, ChevronDown, ChevronRight, BookOpen, Cloud, CloudOff } from "lucide-react";
 
-// Categorized Inventory
+// --- FIREBASE IMPORTS ---
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
+
+// --- FIREBASE SETUP ---
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'family-dashboard-app';
+
+// --- INITIAL MOCK DATA ---
 const INITIAL_INVENTORY = [
   // Vegetables
   { id: "i1", name: "Tomato", emoji: "🍅", count: 2, category: "Vegetables" },
@@ -118,8 +130,6 @@ export default function App() {
   const [inventory, setInventory] = useState(INITIAL_INVENTORY);
   const [recipes, setRecipes] = useState(INITIAL_RECIPES);
   const [events, setEvents] = useState(INITIAL_EVENTS);
-  const [toastMessage, setToastMessage] = useState(null);
-  
   const [tasks, setTasks] = useState([
     { id: "t1", text: "🧺 Laundry", quadrant: "do", completed: false },
     { id: "t2", text: "❤️ Wife date", quadrant: "do", completed: false }
@@ -134,6 +144,71 @@ export default function App() {
     Sunday: { breakfast: null, breakfastDrink: null, lunch: null, lunchDrink: null, dinner: null, dinnerDrink: null }
   });
 
+  // --- FIREBASE SYNC STATE ---
+  const [user, setUser] = useState(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  // Authentication
+  useEffect(() => {
+    const initAuth = async () => {
+      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+        await signInWithCustomToken(auth, __initial_auth_token);
+      } else {
+        await signInAnonymously(auth);
+      }
+    };
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, setUser);
+    return () => unsubscribe();
+  }, []);
+
+  // Fetch Data Once
+  useEffect(() => {
+    if (!user) return;
+    const unsubscribe = onSnapshot(
+      doc(db, 'artifacts', appId, 'users', user.uid, 'dashboardData'),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.inventory) setInventory(data.inventory);
+          if (data.recipes) setRecipes(data.recipes);
+          if (data.events) setEvents(data.events);
+          if (data.tasks) setTasks(data.tasks);
+          if (data.mealPlan) setMealPlan(data.mealPlan);
+        }
+        setDataLoaded(true);
+      },
+      (error) => {
+        console.error("Firestore fetch error:", error);
+        setDataLoaded(true); // Proceed with default mock data if fail
+      }
+    );
+    return () => unsubscribe();
+  }, [user]);
+
+  // Auto-Save Data (Debounced)
+  useEffect(() => {
+    if (!user || !dataLoaded) return;
+    setIsSaving(true);
+    
+    const saveData = async () => {
+      try {
+        await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'dashboardData'), {
+          inventory, recipes, events, tasks, mealPlan
+        });
+      } catch (e) {
+        console.error("Save error:", e);
+      } finally {
+        setTimeout(() => setIsSaving(false), 500); // Visual delay for badge
+      }
+    };
+
+    const timer = setTimeout(saveData, 1500); // Wait 1.5s after last change to save
+    return () => clearTimeout(timer);
+  }, [inventory, recipes, events, tasks, mealPlan, user, dataLoaded]);
+
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -145,9 +220,13 @@ export default function App() {
     ));
   };
 
+  if (!dataLoaded) {
+    return <div className="min-h-screen bg-[#F4F0E6] flex items-center justify-center text-4xl font-black uppercase">Loading Cloud...</div>
+  }
+
   return (
     <div className="min-h-screen bg-[#F4F0E6] text-black font-sans selection:bg-[#FF90E8] p-2 md:p-8 relative pb-24">
-      {/* Toast Notification System */}
+      {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[100] bg-black text-white border-4 border-black px-6 py-3 font-black uppercase text-center shadow-[4px_4px_0_0_#FFD500] animate-bounce">
           {toastMessage}
@@ -156,7 +235,16 @@ export default function App() {
 
       {/* Header */}
       <header className="mb-8 border-4 border-black bg-[#FFD500] p-4 md:p-6 shadow-[8px_8px_0_0_#000] flex flex-col lg:flex-row justify-between items-center gap-4 sticky top-2 z-50">
-        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center">Family Board</h1>
+        <div className="flex items-center gap-4">
+            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center">Family Board</h1>
+            
+            {/* Cloud Sync Status */}
+            <div className={`hidden md:flex items-center gap-2 border-2 border-black px-3 py-1 font-black text-xs uppercase shadow-[2px_2px_0_0_#000] transition-colors ${isSaving ? 'bg-[#FF90E8] text-black' : 'bg-[#4ADE80] text-black'}`}>
+               {isSaving ? <Cloud size={14} className="animate-pulse" /> : <Cloud size={14} />}
+               {isSaving ? 'Saving...' : 'Synced'}
+            </div>
+        </div>
+        
         <nav className="flex flex-wrap justify-center gap-2">
           {[
             { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'bg-[#FF90E8]' },
