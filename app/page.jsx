@@ -119,6 +119,39 @@ const INITIAL_EVENTS = [
   { id: "e2", date: "2026-08-22", title: "🏖 Holiday" },
 ];
 
+const callGeminiAPI = async (payload, retries = 3, delay = 1000) => {
+  const apiKey = ""; // Left empty for Canvas to inject
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      if (response.status === 429 && retries > 0) {
+        await new Promise(r => setTimeout(r, delay));
+        return callGeminiAPI(payload, retries - 1, delay * 2);
+      }
+      throw new Error(`API Error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content) {
+       return data.candidates[0].content.parts[0].text;
+    }
+    throw new Error('Invalid response format');
+  } catch (error) {
+    if (retries > 0) {
+      await new Promise(r => setTimeout(r, delay));
+      return callGeminiAPI(payload, retries - 1, delay * 2);
+    }
+    throw error;
+  }
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState("calendar");
   const [inventory, setInventory] = useState(INITIAL_INVENTORY);
@@ -196,29 +229,21 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F0E6] text-black font-sans selection:bg-[#FF90E8] flex flex-col relative pb-24">
-      <title>Family Dashboard</title>
-      
-      {/* Toast */}
+    <div className="min-h-screen bg-[#F4F0E6] text-black font-sans selection:bg-[#FF90E8] p-2 md:p-8 relative pb-24">
+      {/* Toast Notification System */}
       {toastMessage && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[100] bg-black text-white border-4 border-black px-6 py-3 font-black uppercase text-center shadow-[4px_4px_0_0_#FFD500] animate-bounce">
           {toastMessage}
         </div>
       )}
 
-      {/* COMPACT HEADER */}
-      <header className="border-b-4 border-black bg-[#FFD500] p-2 shadow-[4px_4px_0_0_#000] sticky top-0 z-50 flex flex-col sm:flex-row justify-between items-center gap-2">
-        <div className="flex justify-between items-center w-full sm:w-auto px-2">
-            <h1 className="text-xl md:text-2xl font-black uppercase tracking-tight">Family Board</h1>
-            
-            <div className="flex gap-2 sm:hidden">
-              <button onClick={handleExport} className="p-1 bg-white border-2 border-black shadow-[2px_2px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5"><Download size={16}/></button>
-              <button onClick={() => fileInputRef.current.click()} className="p-1 bg-white border-2 border-black shadow-[2px_2px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5"><Upload size={16}/></button>
-            </div>
+      {/* Header */}
+      <header className="mb-8 border-4 border-black bg-[#FFD500] p-4 md:p-6 shadow-[8px_8px_0_0_#000] flex flex-col lg:flex-row justify-between items-center gap-4 sticky top-2 z-50">
+        <div className="flex flex-col items-center lg:items-start">
+            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center">Family Board</h1>
+            <span className="bg-white text-[10px] font-black uppercase px-2 py-0.5 border-2 border-black mt-1 shadow-[2px_2px_0_0_#000]">{saveIndicator || "Synced"}</span>
         </div>
-        
-        {/* Navigation Tabs */}
-        <nav className="flex flex-wrap justify-center gap-1 sm:gap-2 w-full sm:w-auto">
+        <nav className="flex flex-wrap justify-center gap-2">
           {[
             { id: 'calendar', label: 'Dates', icon: CalendarIcon, color: 'bg-[#FF90E8]' },
             { id: 'tasks', label: 'Tasks', icon: CheckSquare, color: 'bg-[#4ADE80]' },
@@ -229,8 +254,9 @@ export default function App() {
             <button 
               key={tab.id} 
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1 border-2 border-black px-2 py-1 md:px-3 text-xs font-black uppercase shadow-[2px_2px_0_0_#000] transition-transform active:translate-x-0.5 active:translate-y-0.5
-                ${activeTab === tab.id ? `${tab.color} translate-x-0.5 translate-y-0.5 !shadow-none` : tab.color}`}
+              className={`flex items-center gap-2 border-4 border-black px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none
+                ${activeTab === tab.id ? `${tab.color} translate-x-1 translate-y-1 !shadow-none` : tab.color}
+                hover:opacity-90`}
             >
               <tab.icon size={16} className="hidden sm:block" /> {tab.label}
             </button>
@@ -282,8 +308,13 @@ function CalendarView({ events, setEvents, showToast }) {
     : events.filter(e => e.date.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`));
 
   const openModal = (evt = null) => {
-    if (evt) { setEditEventId(evt.id); setFormTitle(evt.title); } 
-    else { setEditEventId(null); setFormTitle(""); }
+    if (evt) {
+      setEditEventId(evt.id);
+      setFormTitle(evt.title);
+    } else {
+      setEditEventId(null);
+      setFormTitle("");
+    }
     setIsModalOpen(true);
   };
 
@@ -403,10 +434,12 @@ function CalendarView({ events, setEvents, showToast }) {
             <h2 className="text-2xl font-black uppercase mb-6">{editEventId ? 'Edit Event' : 'New Event'}</h2>
             <div className="mb-6">
               <label className="block font-black uppercase text-sm mb-2">Event Title / Emoji</label>
-              {quickEmojis.map(emo => (
+              <div className="flex gap-2 mb-3">
+               {quickEmojis.map(emo => (
                    <button key={emo} onClick={() => setFormTitle(prev => emo + " " + prev)} className="w-8 h-8 bg-[#F4F0E6] border-2 border-black text-sm hover:bg-[#FFD500] shadow-[2px_2px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5">{emo}</button>
                ))}
-              <input 
+            </div>
+            <input 
                 type="text" 
                 value={formTitle}
                 onChange={e => setFormTitle(e.target.value)}
@@ -428,6 +461,7 @@ function CalendarView({ events, setEvents, showToast }) {
 function MatrixView({ tasks, setTasks, showToast }) {
   const [newTaskInput, setNewTaskInput] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
+
   const quadrants = [
     { id: "do", title: "Do First", bg: "bg-[#FF8A8A]", desc: "Urgent & Important" },
     { id: "schedule", title: "Schedule", bg: "bg-[#93C5FD]", desc: "Not Urgent, Important" },
@@ -575,12 +609,9 @@ function MatrixView({ tasks, setTasks, showToast }) {
                   >
                     {task.completed && <div className="w-3 h-3 bg-black"></div>}
                   </div>
-                  
-                  {/* Persistent Edit/Delete Actions */}
-                  <div className="flex gap-1 flex-shrink-0" onClick={e=>e.stopPropagation()}>
-                     <button onClick={() => { setEditingId(task.id); setEditVal(task.text); }} className="p-1 bg-white border border-black hover:bg-gray-200"><Edit2 size={12}/></button>
-                     <button onClick={() => { setTasks(tasks.filter(x => x.id !== task.id)); updateTimestamp(); }} className="p-1 bg-[#FF8A8A] border border-black hover:bg-red-500"><Trash2 size={12}/></button>
-                  </div>
+                  <p className={`font-bold text-sm leading-tight break-words ${task.completed ? 'line-through opacity-70' : ''}`}>
+                    {task.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -780,16 +811,10 @@ function PlannerView({ mealPlan, setMealPlan, recipes, setRecipes, inventory, se
       </div>
 
       {mealPlan[day][mealType] ? (
-        <div 
-            draggable 
-            onDragStart={(e) => onDragStartBoardItem(e, mealPlan[day][mealType], day, mealType)}
-            className="bg-white border-2 border-black p-1 shadow-[2px_2px_0_0_#000] relative cursor-grab flex items-center justify-between"
-        >
-           <div className="flex items-center gap-1 overflow-hidden">
-               <span className="text-sm">{recipes.find(r=>r.id === mealPlan[day][mealType])?.emoji}</span>
-               <span className="font-bold text-[10px] uppercase truncate">{recipes.find(r=>r.id === mealPlan[day][mealType])?.name}</span>
-           </div>
-           <button onClick={() => assignMeal(day, mealType, null)} className="bg-[#FF8A8A] border border-black text-black w-4 h-4 flex items-center justify-center font-black text-[8px] hover:bg-black hover:text-white"><X size={10}/></button>
+        <div className="bg-white border-4 border-black p-2 shadow-[4px_4px_0_0_#000] relative cursor-pointer hover:scale-105 transition-transform mt-1" onClick={() => setSelectedRecipeForDetails(recipes.find(r=>r.id === mealPlan[day][mealType]))}>
+           <button onClick={(e) => { e.stopPropagation(); assignMeal(day, mealType, null); }} className="absolute -top-3 -right-3 bg-[#FF8A8A] border-4 border-black text-black w-8 h-8 flex items-center justify-center font-black text-sm hidden group-hover:flex hover:bg-black hover:text-white z-10"><X size={16}/></button>
+           <span className="text-3xl block text-center mb-1">{recipes.find(r=>r.id === mealPlan[day][mealType])?.emoji}</span>
+           <span className="font-bold text-xs uppercase block text-center truncate">{recipes.find(r=>r.id === mealPlan[day][mealType])?.name}</span>
         </div>
       ) : (
         <div className="flex-1 border-4 border-dashed border-black opacity-30 flex items-center justify-center text-[10px] font-black uppercase text-center p-2 mt-1">Drop Recipe</div>
@@ -1041,6 +1066,12 @@ function InventoryView({ inventory, updateInventory, showToast }) {
 
   return (
     <div>
+      <div className="bg-[#4ADE80] border-4 border-black p-4 md:p-6 shadow-[8px_8px_0_0_#000] mb-8 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+        <div>
+          <h2 className="text-3xl font-black uppercase">Stash (Bag)</h2>
+          <p className="font-bold text-sm uppercase mt-1 opacity-90">Categorized inventory. Tap headers to collapse.</p>
+        </div>
+      </div>
 
       <div className="space-y-8">
         {categories.map(cat => {
