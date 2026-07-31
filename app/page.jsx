@@ -6,50 +6,76 @@ import { Plus, Minus, Calendar as CalendarIcon, CheckSquare, Utensils, ShoppingC
 const INITIAL_INVENTORY = [
   // Vegetables
   { id: "i1", name: "Tomato", emoji: "🍅", count: 2, category: "Vegetables" },
-  { id: "i3", name: "Avocado", emoji: "🥑", count: 4, category: "Vegetables" },
+  { id: "i8", name: "Cherry Tomato", emoji: "🍅", count: 0, category: "Vegetables" },
   { id: "i39", name: "Cucumber", emoji: "🥒", count: 0, category: "Vegetables" },
   { id: "i40", name: "Pumpkin", emoji: "🎃", count: 0, category: "Vegetables" },
-  { id: "i20", name: "Carrots", emoji: "🥕", count: 0, category: "Vegetables" },
-  { id: "i21", name: "Potatoes", emoji: "🥔", count: 0, category: "Vegetables" },
+  { id: "i20", name: "Carrot", emoji: "🥕", count: 0, category: "Vegetables" },
+  { id: "i21", name: "Potatoe", emoji: "🥔", count: 0, category: "Vegetables" },
+  { id: "i21", name: "Sweat Potatoe", emoji: "🍠", count: 0, category: "Vegetables" },
   { id: "i22", name: "Corn", emoji: "🌽", count: 0, category: "Vegetables" },
   { id: "i23", name: "Broccoli", emoji: "🥦", count: 0, category: "Vegetables" },
+  { id: "i56", name: "Cauliflower", emoji: "🥦", count: 0, category: "Vegetables" },
   { id: "i26", name: "Pepper", emoji: "🌶️", count: 0, category: "Vegetables" },
   { id: "i18", name: "Onions", emoji: "🧅", count: 0, category: "Vegetables" },
   { id: "i30", name: "Garlic", emoji: "🧄", count: 0, category: "Vegetables" },
   { id: "i31", name: "Eggplant", emoji: "🍆", count: 0, category: "Vegetables" },
-  { id: "i38", name: "Cherry Tomatoes", emoji: "🍅", count: 0, category: "Vegetables" },
+  { id: "i38", name: "Mushroom", emoji: "🍄", count: 0, category: "Vegetables" },
+  { id: "i57", name: "Spinach", emoji: "🍃", count: 0, category: "Vegetables" },
+  { id: "i58", name: "Lettuce", emoji: "🥬", count: 0, category: "Vegetables" },
+  { id: "i59", name: "Zucchini", emoji: "🥒", count: 0, category: "Vegetables" },
+  { id: "i60", name: "Cabbage", emoji: "🥬", count: 0, category: "Vegetables" },
+  { id: "i61", name: "Cilantro", emoji: "🌿", count: 0, category: "Vegetables" },
+  { id: "i62", name: "Asparagus", emoji: "🌿", count: 0, category: "Vegetables" },
+  { id: "i63", name: "Peas", emoji: "🫛", count: 0, category: "Vegetables" },
+  { id: "i64", name: "Radish", emoji: "🫜", count: 0, category: "Vegetables" },
+  { id: "i65", name: "Leek", emoji: "🥬", count: 0, category: "Vegetables" },
   // Fruits
   { id: "i35", name: "Banana", emoji: "🍌", count: 0, category: "Fruits" },
   { id: "i36", name: "Apple", emoji: "🍎", count: 0, category: "Fruits" },
+  { id: "i46", name: "Orange", emoji: "🍊", count: 0, category: "Fruits" },
   { id: "i17", name: "Lemons", emoji: "🍋", count: 0, category: "Fruits" },
+  { id: "i3", name: "Avocado", emoji: "🥑", count: 4, category: "Fruits" },
+  { id: "i45", name: "Pineapple", emoji: "🍍", count: 0, category: "Fruits" },
+  { id: "i47", name: "Pear", emoji: "🍐", count: 0, category: "Fruits" },
+  { id: "i42", name: "Strawberries", emoji: "🍓", count: 0, category: "Fruits" },
+  { id: "i43", name: "Blueberries", emoji: "🫐", count: 0, category: "Fruits" },  
+  { id: "i50", name: "Grapes", emoji: "🍇", count: 0, category: "Fruits" },
+  { id: "i44", name: "Kiwi", emoji: "🥝", count: 0, category: "Fruits" },
+  { id: "i49", name: "Watermelon", emoji: "🍉", count: 0, category: "Fruits" },
+  { id: "i51", name: "Pomegranate", emoji: "🫐", count: 0, category: "Fruits" },
+  { id: "i53", name: "Mango", emoji: "🥭", count: 0, category: "Fruits" },
+  { id: "i54", name: "Grapefruit", emoji: "🍊", count: 0, category: "Fruits" },
+  { id: "i55", name: "Tangerine", emoji: "🍊", count: 0, category: "Fruits" },
+  { id: "i52", name: "Coconut", emoji: "🥥", count: 0, category: "Fruits" },
   // Dairy & Eggs
   { id: "i2", name: "Cheese", emoji: "🧀", count: 2, category: "Dairy & Eggs" },
   { id: "i41", name: "Parmesan", emoji: "🧀", count: 0, category: "Dairy & Eggs" },
   { id: "i12", name: "Butter", emoji: "🧈", count: 1, category: "Dairy & Eggs" },
   { id: "i13", name: "Eggs", emoji: "🥚", count: 0, category: "Dairy & Eggs" },
   { id: "i15", name: "Yogurt", emoji: "🥛", count: 0, category: "Dairy & Eggs" },
+  { id: "i66", name: "Mozzarella", emoji: "🧀", count: 0, category: "Dairy & Eggs" },
   // Meat & Seafood
-  { id: "i4", name: "Chicken", emoji: "🍗", count: 5, category: "Meat & Seafood" },
   { id: "i9", name: "Fish", emoji: "🐟", count: 0, category: "Meat & Seafood" },
+  { id: "i4", name: "Chicken", emoji: "🍗", count: 5, category: "Meat & Seafood" },
+  { id: "i67", name: "Chicken Wings", emoji: "🐔", count: 0, category: "Meat & Seafood" },
+  { id: "i68", name: "Beef", emoji: "🥩", count: 0, category: "Meat & Seafood" },
+  { id: "i69", name: "Pork", emoji: "🐷", count: 0, category: "Meat & Seafood" },
   { id: "i10", name: "Ham", emoji: "🍖", count: 0, category: "Meat & Seafood" },
   { id: "i14", name: "Bacon", emoji: "🥓", count: 0, category: "Meat & Seafood" },
-  { id: "i32", name: "Meat Balls", emoji: "🧆", count: 0, category: "Meat & Seafood" },
   { id: "i33", name: "Sausages", emoji: "🌭", count: 0, category: "Meat & Seafood" },
+  { id: "i32", name: "Meat Balls", emoji: "🧆", count: 0, category: "Meat & Seafood" },
   // Carbs
   { id: "i5", name: "Tortilla", emoji: "🌮", count: 0, category: "Carbs" },
+  { id: "i70", name: "Nachos", emoji: "🧀", count: 0, category: "Carbs" },
+  { id: "i71", name: "Baguette", emoji: "🥖", count: 0, category: "Carbs" },
+  { id: "i72", name: "Dumplings", emoji: "🥟", count: 0, category: "Carbs" },
   { id: "i24", name: "Pasta", emoji: "🍝", count: 0, category: "Carbs" },
   { id: "i25", name: "Rice", emoji: "🍚", count: 0, category: "Carbs" },
+  { id: "i73", name: "Couscous", emoji: "🍚", count: 0, category: "Carbs" },
+  { id: "i74", name: "Bulgur", emoji: "🍚", count: 0, category: "Carbs" },
   { id: "i37", name: "Bread", emoji: "🍞", count: 0, category: "Carbs" },
   { id: "i16", name: "Cereal", emoji: "🥣", count: 0, category: "Carbs" },
   { id: "i19", name: "Oatmeal", emoji: "🥣", count: 0, category: "Carbs" },
-  // Drinks
-  { id: "i8", name: "Beer", emoji: "🍺", count: 2, category: "Drinks" },
-  { id: "d1", name: "Water", emoji: "💧", count: 10, category: "Drinks" },
-  { id: "d2", name: "Coffee", emoji: "☕", count: 5, category: "Drinks" },
-  { id: "d3", name: "Tea", emoji: "🍵", count: 5, category: "Drinks" },
-  { id: "d4", name: "Milk", emoji: "🥛", count: 2, category: "Drinks" },
-  { id: "d5", name: "Juice", emoji: "🧃", count: 1, category: "Drinks" },
-  { id: "d6", name: "Wine", emoji: "🍷", count: 1, category: "Drinks" },
   // Pantry & Other
   { id: "i6", name: "Red Salsa", emoji: "🥫", count: 0, category: "Pantry" },
   { id: "i7", name: "Olives", emoji: "🫒", count: 0, category: "Pantry" },
@@ -57,7 +83,17 @@ const INITIAL_INVENTORY = [
   { id: "i27", name: "Mayonnaise", emoji: "🥚", count: 0, category: "Pantry" },
   { id: "i28", name: "Tartare", emoji: "🥣", count: 0, category: "Pantry" },
   { id: "i29", name: "Mustard", emoji: "🌭", count: 0, category: "Pantry" },
-  { id: "i34", name: "Cilantro", emoji: "🌿", count: 0, category: "Pantry" },
+  { id: "i66", name: "Beans", emoji: "🫘", count: 0, category: "Pantry" },
+  { id: "i67", name: "Nachos", emoji: "🧀", count: 0, category: "Pantry" },
+  { id: "i68", name: "Waffles", emoji: "🧇", count: 0, category: "Pantry" },
+    // Drinks
+  { id: "d1", name: "Water", emoji: "💧", count: 10, category: "Drinks" },
+  { id: "d2", name: "Coffee", emoji: "☕", count: 5, category: "Drinks" },
+  { id: "d3", name: "Tea", emoji: "🍵", count: 5, category: "Drinks" },
+  { id: "d4", name: "Milk", emoji: "🥛", count: 2, category: "Drinks" },
+  { id: "d5", name: "Juice", emoji: "🧃", count: 1, category: "Drinks" },
+  { id: "d6", name: "Wine", emoji: "🍷", count: 1, category: "Drinks" },
+  { id: "d7", name: "Beer", emoji: "🍺", count: 2, category: "Drinks" },
 ];
 
 const INITIAL_RECIPES = [
@@ -69,45 +105,19 @@ const INITIAL_RECIPES = [
   { id: "r6", name: "Mac & Cheese", emoji: "🧀", time: "25 min", temp: "180°C", note: "Extra cheesy", ingredients: { "i24": 1, "i2": 2, "d4": 1, "i12": 1 } },
   { id: "r7", name: "Oatmeal Bowl", emoji: "🥣", time: "10 min", temp: "Stovetop", note: "Top with fruits", ingredients: { "i19": 1, "d4": 1, "i35": 1, "i36": 1 } },
   { id: "r8", name: "Grilled Chicken Salad", emoji: "🥗", time: "15 min", temp: "Grill", note: "Fresh and light", ingredients: { "i4": 1, "i39": 1, "i38": 5, "i18": 1 } },
-];
+  { id: "r9", name: "Meat Balls", emoji: "🧆", time: "30 min", temp: "Medium", note: "Serve with sauce", ingredients: { "i32": 5, "i24": 1, "i1": 2 } },
+  { id: "r10", name: "Eggs Benedict", emoji: "🥚", time: "20 min", temp: "Medium", note: "Perfect for brunch", ingredients: { "i13": 2, "i37": 2, "i12": 1, "i18": 1 } },
+  { id: "r11", name: "Scrambled Eggs", emoji: "🥚", time: "10 min", temp: "Medium", note: "Add cheese for flavor", ingredients: { "i13": 3, "i2": 1, "i12": 1 } },
+  { id: "r12", name: "Bacon & Eggs", emoji: "🥓🥚", time: "15 min", temp: "Medium", note: "Classic breakfast", ingredients: { "i14": 4, "i13": 2, "i37": 2 } },
+  { id: "r13", name: "Waffles", emoji: "🧇", time: "15 min", temp: "200°C", note: "Serve with syrup", ingredients: { "i19": 1, "d4": 1, "i12": 1 } },
+  { id: "r14", name: "Chili Con Carne", emoji: "🌶️", time: "40 min", temp: "Medium", note: "Spicy and hearty", ingredients: { "i4": 2, "i26": 1, "i6": 1, "i25": 1 } },
+  { id: "r15", name: "Vegetable Stir Fry", emoji: "🥦", time: "20 min", temp: "High", note: "Quick and healthy", ingredients: { "i23": 1, "i20": 1, "i21": 1, "i18": 1 } }
+  ];
 
 const INITIAL_EVENTS = [
   { id: "e1", date: "2026-08-15", title: "🎂 Birthday" },
   { id: "e2", date: "2026-08-22", title: "🏖 Holiday" },
 ];
-
-const callGeminiAPI = async (payload, retries = 3, delay = 1000) => {
-  const apiKey = ""; // Left empty for Canvas to inject
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    
-    if (!response.ok) {
-      if (response.status === 429 && retries > 0) {
-        await new Promise(r => setTimeout(r, delay));
-        return callGeminiAPI(payload, retries - 1, delay * 2);
-      }
-      throw new Error(`API Error: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content) {
-       return data.candidates[0].content.parts[0].text;
-    }
-    throw new Error('Invalid response format');
-  } catch (error) {
-    if (retries > 0) {
-      await new Promise(r => setTimeout(r, delay));
-      return callGeminiAPI(payload, retries - 1, delay * 2);
-    }
-    throw error;
-  }
-};
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("calendar");
@@ -186,23 +196,31 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F0E6] text-black font-sans selection:bg-[#FF90E8] p-2 md:p-8 relative pb-24">
-      {/* Toast Notification System */}
+    <div className="min-h-screen bg-[#F4F0E6] text-black font-sans selection:bg-[#FF90E8] flex flex-col relative pb-24">
+      <title>Family Dashboard</title>
+      
+      {/* Toast */}
       {toastMessage && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[100] bg-black text-white border-4 border-black px-6 py-3 font-black uppercase text-center shadow-[4px_4px_0_0_#FFD500] animate-bounce">
           {toastMessage}
         </div>
       )}
 
-      {/* Header */}
-      <header className="mb-8 border-4 border-black bg-[#FFD500] p-4 md:p-6 shadow-[8px_8px_0_0_#000] flex flex-col lg:flex-row justify-between items-center gap-4 sticky top-2 z-50">
-        <div className="flex flex-col items-center lg:items-start">
-            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center">Family Board</h1>
-            <span className="bg-white text-[10px] font-black uppercase px-2 py-0.5 border-2 border-black mt-1 shadow-[2px_2px_0_0_#000]">{saveIndicator || "Synced"}</span>
+      {/* COMPACT HEADER */}
+      <header className="border-b-4 border-black bg-[#FFD500] p-2 shadow-[4px_4px_0_0_#000] sticky top-0 z-50 flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div className="flex justify-between items-center w-full sm:w-auto px-2">
+            <h1 className="text-xl md:text-2xl font-black uppercase tracking-tight">Family Board</h1>
+            
+            <div className="flex gap-2 sm:hidden">
+              <button onClick={handleExport} className="p-1 bg-white border-2 border-black shadow-[2px_2px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5"><Download size={16}/></button>
+              <button onClick={() => fileInputRef.current.click()} className="p-1 bg-white border-2 border-black shadow-[2px_2px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5"><Upload size={16}/></button>
+            </div>
         </div>
-        <nav className="flex flex-wrap justify-center gap-2">
+        
+        {/* Navigation Tabs */}
+        <nav className="flex flex-wrap justify-center gap-1 sm:gap-2 w-full sm:w-auto">
           {[
-            { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'bg-[#FF90E8]' },
+            { id: 'calendar', label: 'Dates', icon: CalendarIcon, color: 'bg-[#FF90E8]' },
             { id: 'tasks', label: 'Tasks', icon: CheckSquare, color: 'bg-[#4ADE80]' },
             { id: 'planner', label: 'Meals', icon: Utensils, color: 'bg-[#A7F3D0]' },
             { id: 'inventory', label: 'Bag', icon: Box, color: 'bg-white' },
@@ -211,11 +229,10 @@ export default function App() {
             <button 
               key={tab.id} 
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 border-4 border-black px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none
-                ${activeTab === tab.id ? `${tab.color} translate-x-1 translate-y-1 !shadow-none` : tab.color}
-                hover:opacity-90`}
+              className={`flex items-center gap-1 border-2 border-black px-2 py-1 md:px-3 text-xs font-black uppercase shadow-[2px_2px_0_0_#000] transition-transform active:translate-x-0.5 active:translate-y-0.5
+                ${activeTab === tab.id ? `${tab.color} translate-x-0.5 translate-y-0.5 !shadow-none` : tab.color}`}
             >
-              <tab.icon size={18} className="hidden sm:block" /> {tab.label}
+              <tab.icon size={16} className="hidden sm:block" /> {tab.label}
             </button>
           ))}
         </nav>
@@ -248,9 +265,8 @@ function CalendarView({ events, setEvents, showToast }) {
   const firstDay = new Date(year, month, 1).getDay();
   const startDay = (firstDay + 6) % 7; // Mon=0, Sun=6
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  
-  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const quickEmojis = ['🎂', '🏖', '⚽', '🎬', '✈️', '🎉'];
   const handlePrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const handleNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
   const handleToday = () => {
@@ -266,13 +282,8 @@ function CalendarView({ events, setEvents, showToast }) {
     : events.filter(e => e.date.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`));
 
   const openModal = (evt = null) => {
-    if (evt) {
-      setEditEventId(evt.id);
-      setFormTitle(evt.title);
-    } else {
-      setEditEventId(null);
-      setFormTitle("");
-    }
+    if (evt) { setEditEventId(evt.id); setFormTitle(evt.title); } 
+    else { setEditEventId(null); setFormTitle(""); }
     setIsModalOpen(true);
   };
 
@@ -337,10 +348,18 @@ function CalendarView({ events, setEvents, showToast }) {
         </div>
       </div>
 
-      {/* Events Feed Sidebar */}
-      <div className="border-4 border-black bg-[#FFD500] shadow-[8px_8px_0_0_#000] flex flex-col h-[600px]">
-        <div className="p-4 border-b-4 border-black bg-white">
-          <h2 className="text-2xl font-black uppercase">{selectedDateStr ? `Events for ${selectedDateStr}` : 'Month Overview'}</h2>
+      {/* Events Sidebar */}
+      <div className="border-4 border-black bg-[#FFD500] shadow-[4px_4px_0_0_#000] flex flex-col h-[400px] lg:h-[500px]">
+        <div className="p-3 border-b-4 border-black bg-white flex justify-between items-center">
+          <h2 className="text-lg font-black uppercase truncate">{selectedDateStr || 'Overview'}</h2>
+          <button 
+            disabled={!selectedDateStr}
+            onClick={() => openModal()}
+            className={`border-2 border-black px-2 py-1 font-black text-xs uppercase shadow-[2px_2px_0_0_#000] whitespace-nowrap
+              ${selectedDateStr ? 'bg-[#4ADE80] active:translate-x-0.5 active:translate-y-0.5' : 'bg-gray-300 opacity-50'}`}
+          >
+            + Add
+          </button>
         </div>
         
         <div className="p-4 flex-1 overflow-y-auto space-y-4">
@@ -384,6 +403,9 @@ function CalendarView({ events, setEvents, showToast }) {
             <h2 className="text-2xl font-black uppercase mb-6">{editEventId ? 'Edit Event' : 'New Event'}</h2>
             <div className="mb-6">
               <label className="block font-black uppercase text-sm mb-2">Event Title / Emoji</label>
+              {quickEmojis.map(emo => (
+                   <button key={emo} onClick={() => setFormTitle(prev => emo + " " + prev)} className="w-8 h-8 bg-[#F4F0E6] border-2 border-black text-sm hover:bg-[#FFD500] shadow-[2px_2px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5">{emo}</button>
+               ))}
               <input 
                 type="text" 
                 value={formTitle}
@@ -406,7 +428,6 @@ function CalendarView({ events, setEvents, showToast }) {
 function MatrixView({ tasks, setTasks, showToast }) {
   const [newTaskInput, setNewTaskInput] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
-
   const quadrants = [
     { id: "do", title: "Do First", bg: "bg-[#FF8A8A]", desc: "Urgent & Important" },
     { id: "schedule", title: "Schedule", bg: "bg-[#93C5FD]", desc: "Not Urgent, Important" },
@@ -554,9 +575,12 @@ function MatrixView({ tasks, setTasks, showToast }) {
                   >
                     {task.completed && <div className="w-3 h-3 bg-black"></div>}
                   </div>
-                  <p className={`font-bold text-sm leading-tight break-words ${task.completed ? 'line-through opacity-70' : ''}`}>
-                    {task.text}
-                  </p>
+                  
+                  {/* Persistent Edit/Delete Actions */}
+                  <div className="flex gap-1 flex-shrink-0" onClick={e=>e.stopPropagation()}>
+                     <button onClick={() => { setEditingId(task.id); setEditVal(task.text); }} className="p-1 bg-white border border-black hover:bg-gray-200"><Edit2 size={12}/></button>
+                     <button onClick={() => { setTasks(tasks.filter(x => x.id !== task.id)); updateTimestamp(); }} className="p-1 bg-[#FF8A8A] border border-black hover:bg-red-500"><Trash2 size={12}/></button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -756,10 +780,16 @@ function PlannerView({ mealPlan, setMealPlan, recipes, setRecipes, inventory, se
       </div>
 
       {mealPlan[day][mealType] ? (
-        <div className="bg-white border-4 border-black p-2 shadow-[4px_4px_0_0_#000] relative cursor-pointer hover:scale-105 transition-transform mt-1" onClick={() => setSelectedRecipeForDetails(recipes.find(r=>r.id === mealPlan[day][mealType]))}>
-           <button onClick={(e) => { e.stopPropagation(); assignMeal(day, mealType, null); }} className="absolute -top-3 -right-3 bg-[#FF8A8A] border-4 border-black text-black w-8 h-8 flex items-center justify-center font-black text-sm hidden group-hover:flex hover:bg-black hover:text-white z-10"><X size={16}/></button>
-           <span className="text-3xl block text-center mb-1">{recipes.find(r=>r.id === mealPlan[day][mealType])?.emoji}</span>
-           <span className="font-bold text-xs uppercase block text-center truncate">{recipes.find(r=>r.id === mealPlan[day][mealType])?.name}</span>
+        <div 
+            draggable 
+            onDragStart={(e) => onDragStartBoardItem(e, mealPlan[day][mealType], day, mealType)}
+            className="bg-white border-2 border-black p-1 shadow-[2px_2px_0_0_#000] relative cursor-grab flex items-center justify-between"
+        >
+           <div className="flex items-center gap-1 overflow-hidden">
+               <span className="text-sm">{recipes.find(r=>r.id === mealPlan[day][mealType])?.emoji}</span>
+               <span className="font-bold text-[10px] uppercase truncate">{recipes.find(r=>r.id === mealPlan[day][mealType])?.name}</span>
+           </div>
+           <button onClick={() => assignMeal(day, mealType, null)} className="bg-[#FF8A8A] border border-black text-black w-4 h-4 flex items-center justify-center font-black text-[8px] hover:bg-black hover:text-white"><X size={10}/></button>
         </div>
       ) : (
         <div className="flex-1 border-4 border-dashed border-black opacity-30 flex items-center justify-center text-[10px] font-black uppercase text-center p-2 mt-1">Drop Recipe</div>
@@ -1011,12 +1041,6 @@ function InventoryView({ inventory, updateInventory, showToast }) {
 
   return (
     <div>
-      <div className="bg-[#4ADE80] border-4 border-black p-4 md:p-6 shadow-[8px_8px_0_0_#000] mb-8 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-black uppercase">Stash (Bag)</h2>
-          <p className="font-bold text-sm uppercase mt-1 opacity-90">Categorized inventory. Tap headers to collapse.</p>
-        </div>
-      </div>
 
       <div className="space-y-8">
         {categories.map(cat => {
@@ -1155,7 +1179,7 @@ function ShoppingView({ mealPlan, inventory, recipes, updateInventory, showToast
         </div>
         {shoppingList.length > 0 && (
           <button onClick={handleCopyList} className="bg-black text-[#FFD500] border-4 border-black px-6 py-3 font-black text-lg uppercase shadow-[4px_4px_0_0_#FFD500] active:translate-x-1 active:translate-y-1 active:shadow-none flex items-center justify-center gap-2 transition-transform hover:-translate-y-1">
-            <Copy size={20} /> Copy Text
+            <Copy size={20} /> Copy List
           </button>
         )}
       </div>
